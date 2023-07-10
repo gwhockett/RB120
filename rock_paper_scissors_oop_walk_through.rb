@@ -1,9 +1,19 @@
 class Player
-  attr_accessor :move
+  attr_accessor :move, :name
 
   def initialize(player_type = :human)
     @player_type = player_type
     @move = nil
+    set_name
+  end
+
+  def set_name
+    if human?
+      puts "Please enter your name:"
+      self.name = gets.chomp
+    else
+      self.name = ['R2D2', 'HAL', 'Chappy', 'Number 5'].sample
+    end
   end
 
   def choose
@@ -43,33 +53,41 @@ class RPSGame
   end
 
   def display_winner
-    puts "You chose #{human.move}."
-    puts "The computer chose #{computer.move}."
+    puts "#{human.name} chose #{human.move}."
+    puts "#{computer.name} chose #{computer.move}."
 
     case human.move
     when 'rock'
       puts "It's a tie!" if computer.move == 'rock'
-      puts "You won!" if computer.move == 'scissors'
-      puts "You lose!" if computer.move == 'paper'
+      puts "#{human.name} won!" if computer.move == 'scissors'
+      puts "You lose! #{computer.name} won!" if computer.move == 'paper'
     when 'paper'
       puts "It's a tie!" if computer.move == 'paper'
-      puts "You won!" if computer.move == 'rock'
-      puts "You lose!" if computer.move == 'scissors'
+      puts "#{human.name} won!" if computer.move == 'rock'
+      puts "You lose! #{computer.name} won!" if computer.move == 'scissors'
     when 'scissors'
       puts "It's a tie!" if computer.move == 'scissors'
-      puts "You won!" if computer.move == 'paper'
-      puts "You lose!" if computer.move == 'rock'
+      puts "#{human.name} won!" if computer.move == 'paper'
+      puts "You lose! #{computer.name} won!" if computer.move == 'rock'
     end
+  end
+
+  def play_again
+    puts "Enter 'y' to play again."
+    gets.chomp.downcase
   end
 
   def play
     display_welcome_message
-    human.choose
-    computer.choose
-    display_winner
+
+    loop do
+      human.choose
+      computer.choose
+      display_winner
+      break unless play_again == 'y'
+    end
     display_goodbye_message
   end
 end
 
-game = RPSGame.new
-game.play
+RPSGame.new.play
