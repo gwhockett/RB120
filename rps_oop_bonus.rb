@@ -191,11 +191,6 @@ class RPSGame
     puts "", "Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!"
   end
 
-  # def play_again
-  #   puts "Enter 'y' to play again."
-  #   gets.chomp.downcase
-  # end
-
   def play
     loop do
       human.choose
