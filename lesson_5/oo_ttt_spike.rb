@@ -1,5 +1,3 @@
-require 'pry'
-
 class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
@@ -60,55 +58,69 @@ class Board
     end
   end
 
-  def random_move(plyr_mrk)
+  def random_square(plyr_mrk)
     self[no_move_keys.sample] = plyr_mrk
   end
 
-  def middle_square(plyr_mrk)
-    return self[5] = plyr_mrk if self[5] == Square::NO_MOVE
-    random_move(plyr_mrk)
-  end
-
-  def offence_move(plyr_mrk)
+  def easy_difficulty(plyr_mrk)
     WINNING_LINES.each do |line|
       if line_breakdown?(three_mark(line), plyr_mrk)
         return no_move_squares(line).sample.marker = plyr_mrk
       end
     end
-    middle_square(plyr_mrk)
+    random_square(plyr_mrk)
   end
 
-  def defense_move(plyr_mrk, other_plyr_mrk)
+  def medium_difficulty(plyr_mrk, other_plyr_mrk)
     WINNING_LINES.each do |line|
       if line_breakdown?(three_mark(line), other_plyr_mrk)
         return no_move_squares(line)[0].marker = plyr_mrk
       end
     end
-    offence_move(plyr_mrk)
+    random_square(plyr_mrk)
   end
 
-  def game_ending_move(plyr_mrk, other_plyr_mrk)
+  def middle_square(plyr_mrk)
+    return self[5] = plyr_mrk if @squares[5].unmarked?
+    random_square(plyr_mrk)
+  end
+
+  def hard_defense(plyr_mrk, other_plyr_mrk)
+    WINNING_LINES.each do |line|
+      if line_breakdown?(three_mark(line), other_plyr_mrk)
+        return no_move_squares(line)[0].marker = plyr_mrk
+      end
+    end
+    middle_square(plyr_mrk)
+  end
+
+  def hard_difficulty(plyr_mrk, other_plyr_mrk)
     WINNING_LINES.each do |line|
       if line_breakdown?(three_mark(line), plyr_mrk)
         return no_move_squares(line).sample.marker = plyr_mrk
       end
     end
-    defense_move(plyr_mrk, other_plyr_mrk)
+    hard_defense(plyr_mrk, other_plyr_mrk)
   end
+
+  def square_id(num)
+    no_move_keys.size == 9 ? num : ' '
+  end
+
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/MethodLength
   def draw
-    puts "     |     |"
-    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
-    puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
-    puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
-    puts "     |     |"
+    puts "             |     |"
+    puts "          #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
+    puts "         #{square_id(1)}   | #{square_id(2)}   | #{square_id(3)}"
+    puts "        -----+-----+-----"
+    puts "             |     |"
+    puts "          #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
+    puts "         #{square_id(4)}   | #{square_id(5)}   | #{square_id(6)}"
+    puts "        -----+-----+-----"
+    puts "             |     |"
+    puts "          #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
+    puts "         #{square_id(7)}   | #{square_id(8)}   | #{square_id(9)}"
   end
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/MethodLength
@@ -140,11 +152,11 @@ class Player
 end
 
 class TTTGame
-  EASY = ':-/...meh'
-  MEDIUM = ';-|...Hmmm'
-  HARD = 'wait, what? >%-{}...@#$^!'
-  FIRST = 'first'
+  FIRST  = 'first'
   SECOND = 'second'
+  EASY   = '  :-/  ...meh'
+  MEDIUM = '  ;-|  ...hmmm'
+  HARD   = '  >%-{}  ...@#$^!'
 
   attr_reader :board, :human, :computer
   attr_accessor :order_choice, :match_score, :difficulty
@@ -224,7 +236,6 @@ class TTTGame
   def assign_difficulty(level)
     difficulties = [EASY, MEDIUM, HARD]
     self.difficulty = difficulties[level - 1]
-    self.order_choice = SECOND if level == 3
   end
 
   def choose_difficulty
@@ -250,24 +261,25 @@ class TTTGame
     clear
   end
 
-  def display_welcome_message
+  def welcome_message
     puts "Welcome to Tic Tac Toe!"
   end
 
-  def display_goodbye_message
+  def goodbye_message
     puts "Thanks for playing Tic Tac Toe, #{human.name}!"
   end
 
-  def display_mark_info
+  def mark_info
+    puts ''
     puts "#{human.name} is #{human.marker}."
     puts "#{computer.name} is #{computer.marker}."
     puts ''
   end
 
-  def display_match_info
-    puts ''
+  def match_info
     puts "First to win 5 games wins the match!"
-    puts "Difficulty is set to #{difficulty}"
+    puts ''
+    puts "Difficulty is set to: #{difficulty}"
     puts ''
     puts "#{human.name}'s score: #{match_score[:human]}"
     puts "#{computer.name}'s score: #{match_score[:computer]}"
@@ -275,9 +287,9 @@ class TTTGame
   end
 
   def display_board
-    display_mark_info
+    match_info
     board.draw
-    display_match_info
+    mark_info
   end
 
   def clear_screen_and_display_board
@@ -285,7 +297,7 @@ class TTTGame
     display_board
   end
 
-  def display_game_result
+  def game_result_message
     clear_screen_and_display_board
     case board.winning_marker
     when human.marker
@@ -318,11 +330,11 @@ class TTTGame
   def computer_moves
     case difficulty
     when EASY
-      board.offence_move(computer.marker)
+      board.easy_difficulty(computer.marker)
     when MEDIUM
-      board.defense_move(computer.marker, human.marker)
+      board.medium_difficulty(computer.marker, human.marker)
     when HARD
-      board.game_ending_move(computer.marker, human.marker)
+      board.hard_difficulty(computer.marker, human.marker)
     end
   end
 
@@ -341,7 +353,7 @@ class TTTGame
     computer_moves
   end
 
-  def display_game_reset_message
+  def game_reset_message
     puts ''
     puts "Let's play again!"
     puts "Press 'enter' to continue."
@@ -375,7 +387,7 @@ class TTTGame
     match_score[:human] == 5 || match_score[:computer] == 5
   end
 
-  def display_match_result
+  def match_result_message
     puts ''
     if match_score[:human] == 5
       puts "#{human.name} won the match!"
@@ -406,9 +418,9 @@ class TTTGame
     loop do
       display_board
       player_moves_loop
-      display_game_result
+      game_result_message
       break if score_five?
-      display_game_reset_message
+      game_reset_message
       game_reset
     end
   end
@@ -416,7 +428,7 @@ class TTTGame
   def match_loop
     loop do
       game_loop
-      display_match_result
+      match_result_message
       break unless match_again?
       match_reset
     end
@@ -424,10 +436,10 @@ class TTTGame
 
   def play
     clear
-    display_welcome_message
+    welcome_message
     match_parameter_choices
     match_loop
-    display_goodbye_message
+    goodbye_message
   end
 end
 
