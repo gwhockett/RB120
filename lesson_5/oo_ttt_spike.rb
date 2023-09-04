@@ -1,7 +1,232 @@
-class Board
+module Displayable
+  def clear
+    system 'clear'
+  end
+
+  def welcome_message
+    puts "Welcome to Tic Tac Toe!", ''
+  end
+
+  def player_names_message(human_name, computer_name)
+    puts "Hello, #{human_name}!"
+    puts "You will be playing against #{computer_name}."
+  end
+
+  def whos_on_first_message
+    puts "Who goes first? You or #{computer.name}?"
+    puts "Turn order rotates between games.", ''
+    puts "Enter '1' to make the first move or '2' to go second."
+    puts "Enter '3' if you would like #{computer.name} to choose."
+  end
+
+  def goodbye_message
+    puts "Thanks for playing Tic Tac Toe, #{human.name}!"
+  end
+
+  def mark_info
+    puts ''
+    puts "#{human.name} is #{human.marker}."
+    puts "#{computer.name} is #{computer.marker}."
+    puts ''
+  end
+
+  def match_info
+    puts "First to win 5 games wins the match!"
+    puts ''
+    puts "Difficulty is set to: #{difficulty}"
+    puts ''
+    puts "#{human.name}'s score: #{human.score}"
+    puts "#{computer.name}'s score: #{computer.score}"
+    puts ''
+  end
+
+  def game_reset_message
+    puts ''
+    puts "Let's play again!"
+    puts "Press 'enter' to continue."
+    gets
+  end
+
+  def display_board
+    match_info
+    board.draw
+    mark_info
+  end
+
+  def game_result_message
+    clear_screen_and_display_board
+    case board.winning_marker
+    when human.marker
+      puts "#{human.name} won the game!"
+    when computer.marker
+      puts "#{computer.name} won the game!"
+    else
+      puts "Tie game. No score."
+    end
+  end
+
+  def clear_screen_and_display_board
+    clear
+    display_board
+  end
+
+  def joinor(arr, separator= ', ', conjunction= 'or')
+    return arr.last if arr.size == 1
+    arr2 = arr - [arr.last]
+    arr2.join(separator) + " #{conjunction} #{arr.last}"
+  end
+
+  def match_result_message
+    puts ''
+    puts "#{match_winner_name} won the match!"
+  end
+end
+
+module Choosable
+  FIRST  = 'first'
+  SECOND = 'second'
+  CHOICES = [ONE = '1', TWO = '2', THREE = '3']
+  DIFFICULTIES = [EASY   = '  :-/  ...meh',
+                  MEDIUM = '  ;-|  ...hmmm',
+                  HARD   = '  >%-{}  ...@#$^!']
+
+  def assign_first_to_move(turn)
+    case turn
+    when ONE
+      self.order_choice = FIRST
+    when TWO
+      self.order_choice = SECOND
+    when THREE
+      self.order_choice = [FIRST, SECOND].sample
+      puts "OK, you will go #{order_choice}."
+    end
+  end
+
+  def choose_first_to_move
+    turn = nil
+    loop do
+      whos_on_first_message
+      turn = gets.chomp
+      break if CHOICES.include?(turn)
+      puts "You must enter #{ONE}, #{TWO}, or #{THREE}!", ''
+    end
+    assign_first_to_move(turn)
+  end
+
+  def assign_difficulty(level)
+    self.difficulty = DIFFICULTIES[level.to_i - 1]
+  end
+
+  def choose_difficulty
+    level = nil
+    loop do
+      puts "How difficult should #{computer.name} play against you?"
+      puts "Enter #{ONE} for easy, #{TWO} for medium and #{THREE} for hard."
+      level = gets.chomp
+      break if CHOICES.include?(level)
+      puts "You must enter #{ONE}, #{TWO}, or #{THREE}!"
+    end
+    assign_difficulty(level)
+  end
+end
+
+module Winable
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                   [[1, 5, 9], [3, 5, 7]]              # diagonals
+
+  def winning_marker
+    WINNING_LINES.each do |line|
+      return @squares[line[0]].marker if winning_line?(line)
+    end
+    nil
+  end
+
+  def easy_difficulty(plyr_mrk)
+    WINNING_LINES.each do |line|
+      if line_breakdown?(three_mark(line), plyr_mrk)
+        return no_move_squares(line).sample.marker = plyr_mrk
+      end
+    end
+    random_square(plyr_mrk)
+  end
+
+  def medium_difficulty(plyr_mrk, other_plyr_mrk)
+    WINNING_LINES.each do |line|
+      if line_breakdown?(three_mark(line), other_plyr_mrk)
+        return no_move_squares(line)[0].marker = plyr_mrk
+      end
+    end
+    random_square(plyr_mrk)
+  end
+
+  def hard_defense(plyr_mrk, other_plyr_mrk)
+    WINNING_LINES.each do |line|
+      if line_breakdown?(three_mark(line), other_plyr_mrk)
+        return no_move_squares(line)[0].marker = plyr_mrk
+      end
+    end
+    middle_square(plyr_mrk)
+  end
+
+  def hard_difficulty(plyr_mrk, other_plyr_mrk)
+    WINNING_LINES.each do |line|
+      if line_breakdown?(three_mark(line), plyr_mrk)
+        return no_move_squares(line).sample.marker = plyr_mrk
+      end
+    end
+    hard_defense(plyr_mrk, other_plyr_mrk)
+  end
+end
+
+class Player
+  include Choosable
+  include Displayable
+
+  MARKS = [X = 'X', O = 'O']
+  COMPUTER_NAMES = ['ChatGPT', 'HAL 9000', 'Ava', 'The Borg', 'Watson']
+
+  attr_accessor :marker, :name, :score
+
+  def initialize
+    @score = 0
+  end
+
+  def assign_players_names(computer)
+    loop do
+      puts "Enter your playing name:"
+      self.name = gets.chomp
+      break if name.strip != ''
+      puts "You must enter at least a single character name!"
+    end
+    computer.name = COMPUTER_NAMES.sample
+    puts ''
+    player_names_message(name, computer.name)
+  end
+
+  def assign_players_marks(computer)
+    loop do
+      puts "Would you like to be 'X' or 'O'?"
+      self.marker = gets.chomp.upcase
+      break if MARKS.include?(marker)
+      puts "You must enter 'X' or 'O'!"
+    end
+    computer_mark(computer)
+  end
+
+  def computer_mark(computer)
+    case marker
+    when X
+      computer.marker = O
+    when O
+      computer.marker = X
+    end
+  end
+end
+
+class Board
+  include Winable
+
   def initialize
     @squares = {}
     (1..9).each { |key| @squares[key] = Square.new }
@@ -39,15 +264,6 @@ class Board
     three_mark(line).uniq.size == 1 && !@squares[line[0]].unmarked?
   end
 
-  # returns winning marker or nil
-
-  def winning_marker
-    WINNING_LINES.each do |line|
-      return @squares[line[0]].marker if winning_line?(line)
-    end
-    nil
-  end
-
   def line_breakdown?(line, plyr_mrk)
     line.count(plyr_mrk) == 2 && line.count(Square::NO_MOVE) == 1
   end
@@ -62,45 +278,9 @@ class Board
     self[no_move_keys.sample] = plyr_mrk
   end
 
-  def easy_difficulty(plyr_mrk)
-    WINNING_LINES.each do |line|
-      if line_breakdown?(three_mark(line), plyr_mrk)
-        return no_move_squares(line).sample.marker = plyr_mrk
-      end
-    end
-    random_square(plyr_mrk)
-  end
-
-  def medium_difficulty(plyr_mrk, other_plyr_mrk)
-    WINNING_LINES.each do |line|
-      if line_breakdown?(three_mark(line), other_plyr_mrk)
-        return no_move_squares(line)[0].marker = plyr_mrk
-      end
-    end
-    random_square(plyr_mrk)
-  end
-
   def middle_square(plyr_mrk)
     return self[5] = plyr_mrk if @squares[5].unmarked?
     random_square(plyr_mrk)
-  end
-
-  def hard_defense(plyr_mrk, other_plyr_mrk)
-    WINNING_LINES.each do |line|
-      if line_breakdown?(three_mark(line), other_plyr_mrk)
-        return no_move_squares(line)[0].marker = plyr_mrk
-      end
-    end
-    middle_square(plyr_mrk)
-  end
-
-  def hard_difficulty(plyr_mrk, other_plyr_mrk)
-    WINNING_LINES.each do |line|
-      if line_breakdown?(three_mark(line), plyr_mrk)
-        return no_move_squares(line).sample.marker = plyr_mrk
-      end
-    end
-    hard_defense(plyr_mrk, other_plyr_mrk)
   end
 
   def square_id(num)
@@ -147,113 +327,28 @@ class Square
   end
 end
 
-class Player
-  attr_accessor :marker, :name
-end
+class TTTMatch < Player
+  include Displayable
+  include Choosable
 
-class TTTGame
-  FIRST  = 'first'
-  SECOND = 'second'
-  EASY   = '  :-/  ...meh'
-  MEDIUM = '  ;-|  ...hmmm'
-  HARD   = '  >%-{}  ...@#$^!'
+  MATCH_WIN = 5
 
-  attr_reader :board, :human, :computer
-  attr_accessor :order_choice, :match_score, :difficulty
-
-  def initialize
-    @board = Board.new
-    @human = Player.new
-    @computer = Player.new
-    @match_score = { human: 0, computer: 0 }
-  end
+  attr_reader :board
+  attr_accessor :order_choice, :difficulty, :human, :computer
 
   private
 
-  def clear
-    system 'clear'
-  end
-
-  def computer_name
-    computer.name = ['ChatGPT', 'HAL 9000', 'Ava', 'The Borg', 'Watson'].sample
-  end
-
-  def choose_players_names
-    loop do
-      puts "Enter your playing name:"
-      human.name = gets.chomp
-      break if human.name.strip != ''
-      puts "You must enter at least a single character name!"
-    end
-    computer_name
-    puts "You will be playing against #{computer.name}."
-  end
-
-  def computer_mark(human_mark)
-    case human_mark
-    when 'X'
-      computer.marker = 'O'
-    when 'O'
-      computer.marker = 'X'
-    end
-  end
-
-  def choose_players_marks
-    loop do
-      puts "Would you like to be 'X' or 'O'?"
-      human.marker = gets.chomp.upcase
-      break if human.marker == 'X' || human.marker == 'O'
-      puts "You must enter 'X' or 'O'!"
-    end
-    computer_mark(human.marker)
-  end
-
-  def assign_first_to_move(turn)
-    case turn
-    when '1'
-      self.order_choice = FIRST
-    when '2'
-      self.order_choice = SECOND
-    when '3'
-      self.order_choice = [FIRST, SECOND].sample
-      puts "OK, you will go #{order_choice}."
-    end
-  end
-
-  def choose_first_to_move
-    turn = nil
-    loop do
-      puts "Who goes first? You or #{computer.name}?"
-      puts "Enter '1' to make the first move or '2' to go second."
-      puts "Enter '3' if you would like #{computer.name} to choose."
-      turn = gets.chomp
-      break if turn == '1' || turn == '2' || turn == '3'
-      puts "You must enter '1', '2', or '3'!"
-    end
-    assign_first_to_move(turn)
-  end
-
-  def assign_difficulty(level)
-    difficulties = [EASY, MEDIUM, HARD]
-    self.difficulty = difficulties[level - 1]
-  end
-
-  def choose_difficulty
-    level = nil
-    loop do
-      puts "How difficult should #{computer.name} play against you?"
-      puts "Enter '1' for easy, '2' for medium and '3' for hard."
-      level = gets.chomp.to_i
-      break if level == 1 || level == 2 || level == 3
-      puts "You must enter '1', '2', or '3'!"
-    end
-    assign_difficulty(level)
+  def generate_board_and_players
+    @board = Board.new
+    @human = Player.new
+    @computer = Player.new
+    human.assign_players_names(computer)
+    puts ''
+    human.assign_players_marks(computer)
   end
 
   def match_parameter_choices
-    choose_players_names
-    puts ''
-    choose_players_marks
+    generate_board_and_players
     puts ''
     choose_first_to_move
     puts ''
@@ -261,70 +356,17 @@ class TTTGame
     clear
   end
 
-  def welcome_message
-    puts "Welcome to Tic Tac Toe!"
-  end
-
-  def goodbye_message
-    puts "Thanks for playing Tic Tac Toe, #{human.name}!"
-  end
-
-  def mark_info
-    puts ''
-    puts "#{human.name} is #{human.marker}."
-    puts "#{computer.name} is #{computer.marker}."
-    puts ''
-  end
-
-  def match_info
-    puts "First to win 5 games wins the match!"
-    puts ''
-    puts "Difficulty is set to: #{difficulty}"
-    puts ''
-    puts "#{human.name}'s score: #{match_score[:human]}"
-    puts "#{computer.name}'s score: #{match_score[:computer]}"
-    puts ''
-  end
-
-  def display_board
-    match_info
-    board.draw
-    mark_info
-  end
-
-  def clear_screen_and_display_board
-    clear
-    display_board
-  end
-
-  def game_result_message
-    clear_screen_and_display_board
-    case board.winning_marker
-    when human.marker
-      puts "#{human.name} won the game!"
-    when computer.marker
-      puts "#{computer.name} won the game!"
-    else
-      puts "Tie game. No score."
-    end
-  end
-
-  def joinor(arr, separator= ', ', conjunction= 'or')
-    return arr.last if arr.size == 1
-    arr2 = arr - [arr.last]
-    arr2.join(separator) + " #{conjunction} #{arr.last}"
-  end
-
   def human_moves
-    square = nil
+    square_choice = nil
+    open_squares = board.no_move_keys.map(&:to_s)
     puts "Please select an open square from:"
-    puts joinor(board.no_move_keys)
+    puts joinor(open_squares)
     loop do
-      square = gets.chomp.to_i
-      break if board.no_move_keys.include?(square)
+      square_choice = gets.chomp
+      break if open_squares.include?(square_choice)
       puts "Sorry, that's not a valid choice."
     end
-    board[square] = human.marker
+    board[square_choice.to_i] = human.marker
   end
 
   def computer_moves
@@ -353,15 +395,14 @@ class TTTGame
     computer_moves
   end
 
-  def game_reset_message
-    puts ''
-    puts "Let's play again!"
-    puts "Press 'enter' to continue."
-    gets
+  def turn_for_next_game
+    return self.order_choice = SECOND if order_choice == FIRST
+    self.order_choice = FIRST
   end
 
   def game_reset
     board.reset_squares
+    turn_for_next_game
     clear
   end
 
@@ -377,28 +418,39 @@ class TTTGame
 
   def score_counter
     if board.winning_marker == human.marker
-      match_score[:human] += 1
+      human.score += 1
     elsif board.winning_marker == computer.marker
-      match_score[:computer] += 1
+      computer.score += 1
     end
   end
 
-  def score_five?
-    match_score[:human] == 5 || match_score[:computer] == 5
+  def match_winner_name
+    if human.score == MATCH_WIN
+      human.name
+    elsif computer.score == MATCH_WIN
+      computer.name
+    end
   end
 
-  def match_result_message
-    puts ''
-    if match_score[:human] == 5
-      puts "#{human.name} won the match!"
-    elsif match_score[:computer] == 5
-      puts "#{computer.name} won the match!"
+  def match_win?
+    human.score == MATCH_WIN || computer.score == MATCH_WIN
+  end
+
+  def next_match_difficulty
+    change = nil
+    loop do
+      puts "Would you like to change #{computer.name}'s game difficulty?"
+      puts "Enter 'y' to change or 'n' to keep."
+      change = gets.chomp.downcase
+      break if change == 'y' || change == 'n'
+      puts "Please enter 'y' or 'n'!"
     end
+    choose_difficulty if change == 'y'
   end
 
   def match_reset
-    match_score[:human] = 0
-    match_score[:computer] = 0
+    human.score = 0
+    computer.score = 0
     game_reset
   end
 
@@ -419,7 +471,7 @@ class TTTGame
       display_board
       player_moves_loop
       game_result_message
-      break if score_five?
+      break if match_win?
       game_reset_message
       game_reset
     end
@@ -430,6 +482,7 @@ class TTTGame
       game_loop
       match_result_message
       break unless match_again?
+      next_match_difficulty
       match_reset
     end
   end
@@ -443,5 +496,5 @@ class TTTGame
   end
 end
 
-game = TTTGame.new
+game = TTTMatch.new
 game.play
