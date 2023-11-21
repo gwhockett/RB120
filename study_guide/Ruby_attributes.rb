@@ -1,18 +1,10 @@
 =begin
-As a general programming concept, we can think of attributes as the different
-characteristics that make up an object.
-
-For example:
-A `Laptop` object might inlcude: make, color dimensions, display, processor,
-memory, storage, battery life, etc. Generally, these attributes (think
-attr_accessor in Ruby) can be accessed and manipulated from outside the object.
+As a general programming concept, we can think of objects as having attributes. Attributes are made of state and behavior. A state might be a string value or integer. A behavior is a function or method that performs a task, which could be as simple as retrieving the value that an object contains.
 
 Implementing attributes depends on the programming language.
-In Ruby, initializing instance variables and their names within a class
-determines the attributes that make up an object.
+A Ruby object's attribute usually is thought to have two components:
 
-Having an instance variable in class with no way access it is not a useful
-attribute. Getters and setters give us access to an object's attributes but do
-not make up a part of an object's state. An object's state is composed of
-instance variables and their values.
+1. An instance variable to store a state (value). Instance variables defined within a class determine the how states can be stored within an instantiated object. An object's instance variable is not useful if we can't access it.
+
+2. A getter and/or setter instance method. Instance methods need to be defined within the class that can give us access to an object's state(s). Generally, Instance methods (behaviors) alone are not considered attributes.
 =end
