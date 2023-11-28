@@ -1,16 +1,18 @@
 =begin
 Instance variables keep track of an object instance's state (values). Instance
-variables are defined within a class but do not store states within a class.
+variables are defined within a class but are scoped at the object level. They
+store state within and object and do not share states within other objects.
 They are defined within the class using `@` in front of a snake case formated
 name. Like this: `@snake_case`. Instance variables can be initialized by the
-constructor method `initialize`,defined instance methods and the relevant
-methods along the method look up path of a class, e.g.,
-`instance_variable_set`. An instance variable's state can be exposed by a
-defined instance method and by the relevant methods along the class's method
-lookup path. As long as an object instance exists, its initialized instance
-variables' values can be referenced and modified. Once an instance variable's
-value has been inintialized, it is generally considered to be an attribute of
-the instance.
+constructor method `initialize`, defined instance methods and the relevant
+methods along the method look up path of a class, e.g., `instance_variable_set`
+Unlike a local variable, an instance variable's state can be accessed by an
+instance method and by the relevant methods along the class's method lookup
+path, even when that instance variable has been initialized outside of the
+instance method. As long as an object instance exists, its initialized instance
+variables' values can be accessed and modified. Once an instance variable's has
+been inintialized by an object, it is generally considered to be an attribute
+of the instance.
 =end
 
 class Dog; end # class definition
