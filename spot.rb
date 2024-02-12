@@ -413,7 +413,7 @@ bob.pets.jump
 `bob.pets` returns a `@pets` array stored within the `Person` object `bob`. `Person` class objects don't
 have a `jump` method defined for array objects to invoke. `kitty` and `bud` are collaborator objects. They
 they are the objects, "pets", that populate the `Person` `bob`'s `@pets` array.
-=end
+
 13
 class Animal
   def initialize(name)
@@ -432,10 +432,63 @@ end
 teddy = Dog.new("Teddy")
 puts teddy.dog_name   
 
-=begin
+
 # What is output and why?
+"bark! bark!  bark! bark!" is output. The `Dog` object `teddy` invokes the instance method `#dog_name` which returns
+a string that interpolates an `@name` instance variable of the calling object. However, `teddy` does not have an initialized
+`@name` instance variable, so `nil` is returned for the interpolation. `Dog#initialize` overrides its inherited
+`Animal#initialize` method and does not call `super`, thus `teddy` cannot initialize `@name`.
+
+14
+class Person
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+al = Person.new('Alexander')
+alex = Person.new(al.name)
+p al.name == alex.name # => true
+p al.name.equal?(alex.name)
 
 
+# In the code above, we want to compare whether the two objects have the same name. `Line 11` currently returns `false`.
+#How could we return `true` on `line 11`? 
+
+# Further, since `al.name == alex.name` returns `true`, does this mean the `String` objects referenced by `al` and
+# `alex`'s `@name` instance variables are the same object? How could we prove our case?
+
+We could have both `al` and `alex` both call the accessor reader method `Person#name` which allow the method `==` to
+compare the value of `@name` within `al` and `alex`. Or we could override `==` within `Person` to compare `self.name`
+to `other.name` to achive the same comparison.
+
+Here `#==` is just checking whether `al.name` and `alex.name` have the return value not whether they are the same objects.
+We could compare `al.name`'s returned object with `alex.name`'s returned object using the method #equal? which compares if
+two objects are the same object.
+=end
+
+15
+class Person
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    "My name is #{name.upcase!}."
+  end
+end
+
+bob = Person.new('Bob')
+puts bob.name
+puts bob
+puts bob.name
+
+=begin
+# What is output on `lines 14, 15, and 16` and why?
 
 
 #50.
@@ -542,5 +595,5 @@ home2 = House.new(150_000)
 puts "Home 1 is cheaper" if home1 < home2 # => Home 1 is cheaper
 puts "Home 2 is more expensive" if home2 > home1 # => Home 2 is more expensive
 
-test change!!!
+
 =end
