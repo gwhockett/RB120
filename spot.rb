@@ -467,7 +467,6 @@ to `other.name` to achive the same comparison.
 Here `#==` is just checking whether `al.name` and `alex.name` have the return value not whether they are the same objects.
 We could compare `al.name`'s returned object with `alex.name`'s returned object using the method #equal? which compares if
 two objects are the same object.
-=end
 
 15
 class Person
@@ -487,8 +486,267 @@ puts bob.name
 puts bob
 puts bob.name
 
-=begin
 # What is output on `lines 14, 15, and 16` and why?
+Line 14 outputs `'Bob'`. Line 15 outputs `"My name is BOB."`. Line 14 outputs `'BOB'`
+On line 14 the `Person` object `bob` invokes the getter method `Person#name` which returns `bob`'s `@name` instance variable value. That value
+is passed to `puts` which outputs `'Bob'` and returns `nil`. On line 15 the `Person` object `bob` is passed to `puts` where `to_s` is invoked
+on `puts`'s arugment. Since `to_s` is overriden for `Person` class objects, `"My name is #{name.upcase!}."` is returned. It that return value,
+string interpolation of the getter `Person#name` invokes the mutating `upcase!` method where the value of the `@name` is changed to `'BOB'`
+`puts` finally outputs `"My name is BOB."` and returns `nil`. Online 16 the `Person` object `bob` invokes the getter method `Person#name`
+that now returns `'BOB'` which is passed to and output by `puts` and returns `nil`.
+
+ 16.
+# Why is it generally safer to invoke a setter method (if available) vs. referencing the instance variable directly when trying to
+# set an instance variable within the class? Give an example.
+If we invoke an undefined method, e.g., misspelling or give the wrong number of arguments or wrong argument type Ruby can give us an error
+warning. This makes it less likely to introduce a bug to our program. If reference an instance variable directly but misspell that instance
+variable Ruby will create a new instance variable, leaving our instance variable unchanged and creating a bug.
+
+class Person
+  attr_accessor :name
+  attr_reader :age
+
+  def initialize(name, age)
+    self.name = name
+    @ge = age
+  end
+
+end
+
+bob = Person.new("bob", 26)
+p bob.name
+p bob
+
+17
+# Give an example of when it would make sense to manually write a custom getter method vs. using `attr_reader`.
+A manual getter allows us to augment the return value of the getter with out changing the value of the instance variable
+referrenced by the getter. We may want to do this to redact a portion of sensitive information, e.g. social security numbers,
+or prepend salutations to a name.
+
+class Police
+  attr_writer :name
+
+  def initialize(name)
+    self.name = name
+  end
+
+  def name
+    "Lt. #{@name}"
+  end
+end
+
+larry = Police.new("Larry")
+puts larry.name
+
+18
+class Shape
+  @@sides = nil
+
+  def self.sides
+    @@sides
+  end
+
+  def sides
+    @@sides
+  end
+end
+
+class Triangle < Shape
+  def initialize
+    @@sides = 3
+  end
+end
+
+class Quadrilateral < Shape
+  def initialize
+    @@sides = 4
+  end
+end
+
+p Triangle.sides #=> nil
+p Triangle.new.sides #=> 3
+p Triangle.sides #=> 3
+Shape.new
+p Triangle.sides #=> 3
+Quadrilateral.new
+p Triangle.sides #=> 4
+p Triangle.new.sides #=> 3
+p Triangle.sides #=> 3
+
+# What can executing `Triangle.sides` return? What can executing `Triangle.new.sides` return?
+# What does this demonstrate about class variables?
+`Triangle.sides` could return `3` or `4` or `nil`. `Triangle.new.sides` can only return `3`
+Class variables' scope available across all related classes. If a class variable's value is
+changed in class that inherates that class variable. The value of that class variable is
+in the super class and any other sub classes of that super class.
+
+19
+# What is the `attr_accessor` method, and why wouldn’t we want to just add `attr_accessor`
+# methods for every instance variable in our class? Give an example.
+The `attr_accessor` method is used to create a getter and setter for an instance variable. When the name of the
+instance variable is passed in as an argument to `attr_accessor` as a symbol without the `@` sign, e.g.
+`attr_accessor :name` would creates a getter and setter for `@name`. `attr_accessor` is great for refactoring
+but doesn't allow for custom getters or setters via its implementation. Also, we may not want to have a getter
+and setter for every instance variable. If only want a getter, then we could use `attr_reader` or only a setter
+for an instance variable, then `attr_writer`. These variations of `attr_*` give Ruby options for encapsulating
+object instance data.
+
+20
+# What is the difference between states and behaviors?
+For instance objects of a class, a state is data that is referenced by an instance variable that is maintained at
+the scope of the instance object and not at within the class itself. A behavior for instance objects of a class
+are the instance methods available to the objects to invoke. Behaviors can be inherited from super-classes or mixed
+in modules but instance variables cannot be inherited.
+
+21
+# What is the difference between instance methods and class methods?
+Instance methods are methods (behaviors) available to be invoked by object instances of a class but not to the class itself.
+An instance of a class must be instantiated to invoke an instance method.
+Class methods are behaviors available to a class but not the instances of that class. Once a class is defined it can invoke class methods
+class methods. Custom class methods need to have `self.` prepended to the name of the method at definition to work as a class method.
+
+22
+# What are collaborator objects, and what is the purpose of using them in OOP? Give an example of how we would work with one.
+Collaborator objects work in conjunction with and stored as state in other objects. They are usually custom objects and unrealted
+to the object they stored in. While any object type can be used as a collaborator, collaborating objects are designed
+and implimented in OOP too determine the relationships different objects can have.
+
+23
+# How and why would we implement a fake operator in a custom class? Give an example.
+First we need to know what a fake operator is. Fake operators are methods that look like genuine operators but Rudy's
+syntactical sugar hides portions of the  fake operator''s syntax to make it more readable. Custom classes inherit
+fake operator's like `==`. If we call `==` with a custom object and pass in another object, `==` returns a boolean as
+to whether they are the same object. If we need to compare a specific state of a custom object using `==` then we could
+override `==` to compare only the specified state.
+
+class Person
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def ==(other)
+    name == other.name
+  end
+end
+
+bob = Person.new("Bob")
+anna = Person.new("Bob")
+p bob.name
+p anna.name
+p bob.name == anna.name
+p bob == bob
+p anna == bob
+
+25
+class Person
+  def initialize(n)
+    @name = n
+  end
+  
+  def get_name
+    @name
+  end
+end
+
+bob = Person.new('bob')
+joe = Person.new('joe')
+
+puts bob.inspect # => #<Person:0x000055e79be5dea8 @name="bob">
+puts joe.inspect # => #<Person:0x000055e79be5de58 @name="joe">
+
+p bob.get_name # => "bob"
+
+# What does the above code demonstrate about how instance variables are scoped?
+Since both `Person` objects, `joe` and `bob`, have their own `@name` that point to different
+string objects at the same time, means that `@name` is scoped within those instances of `Person`
+and not in the class `Person`. We can see that `joe` did not reassign `@name` within `bob`.
+
+26
+# How do class inheritance and mixing in modules affect instance variable scope? Give an example.
+The scope of an ivar is not affected by class inheritance or mixing in modules. Class inheritance
+and mixins can affect how an ivar is initialized within and retrieved from its scope.
+
+27
+# How does encapsulation relate to the public interface of a class?
+Encapsulation, through method access control, allows us to hide internal representation of an object
+from the outside of a class. The public interfaces of a class are the methods available external
+to the class.
+
+28
+class GoodDog
+  DOG_YEARS = 7
+
+  attr_accessor :name, :age
+
+  def initialize(n, a)
+    self.name = n
+    self.age  = a * DOG_YEARS
+  end
+end
+
+sparky = GoodDog.new("Sparky", 4)
+puts sparky
+
+29
+# When does accidental method overriding occur, and why? Give an example.
+Accidental method overriding occurs when an instance method is defined within a custom class that has the same name
+as an inherited method. Overriding methods, especially from the `Object`, class can far reaching, unwanted side
+effects.
+
+class Email
+  def send
+    "Whoosh!"
+  end
+
+  def recieve
+    "You've got mail!"
+  end
+end
+
+message = Email.new
+puts message.recieve
+puts message.send
+puts message.send "recieve"
+
+# Here Object#send has been overriden by Email#send. It would be better to name Email#send to #send_email to prevent any
+# unwanted side effects.
+
+30
+# How is Method Access Control implemented in Ruby? Provide examples of when we would use public,
+# protected, and private access modifiers.
+# Method Access Control is implemented by invoking `Object#private`, `Object#protected` or `Object#public` within a
+# class or module. Instance methods are public by default but once any of the Method Access Control methods are invoked,
+# all methods that are defined afterwards will have that access status until another Method Access Control method is invoked.
+# There are should be as few public methods as possible for any class.
+=end
+
+=begin
+# What is output and why? How could we output a message of our choice instead?
+# `sparky`'s object class name and the encoding information of its memory address.
+# This is output because `puts` calls `to_s` on the object `sparky`. We could override
+# the `GoodDog` class's inherited `to_s` method to output a custom message when `sparky`
+# is passed to `puts`.
+# How is the output above different than the output of the code below, and why?
+# `sparky`'s object class name and the encoding information of its memory address and the initialized
+# ivars `@name` and `@age`
+# `p` invokes the method `inspect` which returns
+class GoodDog
+  DOG_YEARS = 7
+
+  attr_accessor :name, :age
+
+  def initialize(n, a)
+    @name = n
+    @age  = a * DOG_YEARS
+  end
+end
+
+sparky = GoodDog.new("Sparky", 4)
+p sparky
+
+
 
 
 #50.
