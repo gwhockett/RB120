@@ -196,4 +196,135 @@ class Bag
   end
 end
 
+
++++++++++++++
+
+1. Which of the following are objects in Ruby? If they are objects,
+how can you find out what class they belong to?
+
+true
+"hello"
+[1, 2, 3, "happy days"]
+142
+
+These are all objects and to find out what class they belong to, call the 
+`#class` method on each object. This will return which class an object belongs to.
+
+2. If we have a Car class and a Truck class and we want to be able to go_fast, how
+can we add the ability for them to go_fast using the module Speed? How can you check
+if your Car or Truck can now go fast?
+
+Mix in the `Speed` module by adding `include Speed` into each class.
+
+
+module Speed
+  def go_fast
+    puts "I am a #{self.class} and going super fast!"
+  end
+end
+
+class Car
+  def go_slow
+    puts "I am safe and driving slow."
+  end
+end
+
+class Truck
+  def go_very_slow
+    puts "I am a heavy truck and like going very slow."
+  end
+end
+
+3. When we called the go_fast method from an instance of the Car class (as shown below)
+you might have noticed that the string printed when we go fast includes the name of the
+type of vehicle we are using. How is this done?
+
+`self.class` is interpolated in the body of `Speed#go_fast`. `self` references the current
+object that calls `Speed#go_fast`. Calling `#class` on the current object returns the class
+of that object. In this example `small_car` references a `Car` class object. Since
+`self.class` is interpolated in a `string` it's return value is automatically converted to
+a string, so no need to call `to_s`.
+
+4. If we have a class AngryCat how do we create a new instance of this class?
+The AngryCat class might look something like this:
+
+class AngryCat
+  def hiss
+    puts "Hisssss!!!"
+  end
+end
+
+Calling the `#new` method on the `AngryCat` class creates a new `AngryCat` object, i.g.,
+`AngryCat.new`.
+
+5. Which of these two classes would create objects that would have an instance variable
+and how do you know?
+  
+First we can see that the `Pizza` class initalizes an instance variable within the body
+of its `initialize` method, `@name = name`, when it creates a new object. The `Fruit` class
+creates a local variable `name` within its `#initialize` method.
+
+Second we could call `instance_variables` method on an object to see what initialized instance
+variable that object contains. `instance_variables` returns an array of all the instance variable
+for the object it was called on. If it is empty, then it has no instance variables.
+
+class Fruit
+  def initialize(name)
+    name = name
+  end
+end
+
+class Pizza
+  def initialize(name)
+    @name = name
+  end
+end
+
+p Pizza.new("cheese").instance_variables
+p Fruit.new("tomato").instance_variables
+
+7. If we have a class such as the one below:
+You can see in the make_one_year_older method we have used self. What does self refer to here?
+
+`self` refers to the calling the object of `Cat#make_one_year_older` which must be a `Cat` class
+object.
+
+class Cat
+  attr_accessor :type, :age
+
+  def initialize(type)
+    @type = type
+    @age  = 0
+  end
+
+  def make_one_year_older
+    self.age += 1
+  end
+end
+
+8. If we have a class such as the one below:
+In the name of the cats_count method we have used self. What does self refer to in this context?
+
+Since `self` is prepended to the name of a method definition within a class, `self` refers to the class
+`Cat`
+
+class Cat
+  @@cats_count = 0
+
+  def initialize(type)
+    @type = type
+    @age  = 0
+    @@cats_count += 1
+  end
+
+  def self.cats_count
+    @@cats_count
+  end
+end
+
+
+9. If we have the class below, what would you need to call to create a new instance of this class.
+
+We would need the name the class, `Bag`, calling the method `new` that has two arguments passed in.
+E.g., `Bag.new("blue", "cloth")`.
 =end
