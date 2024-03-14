@@ -240,5 +240,141 @@ In Ruby OOP, functionality exposure through method access control and namespace
 hygine makes encapsulation easier and more effective.
 
 OOP reduces the need for duplication of code. It enables quicker application
-builds and updates through the use of pre-written code. 
+builds and updates through the use of pre-written code.
 
+1. You are given the following code:
+
+class Oracle
+  def predict_the_future
+    "You will " + choices.sample
+  end
+
+  def choices
+    ["eat a nice lunch", "take a nap soon", "stay at work late"]
+  end
+end
+
+# What is the result of executing the following code:
+# Line 264 instantiates a new `Oracle` class object referenced by the local variable `oracle`.
+# `oracle` calls `Oracle#predict_the_future` at line 265. The body of the `#predict_the_future` concatenates `"You will "` to
+# the return value of `String#sample` which is called by `Oracle#choices`. `String#sample` randomly returns one of the strings 
+# within the array returned by `Oracle#choices`.
+# 
+
+oracle = Oracle.new
+oracle.predict_the_future
+
+2. We have an Oracle class and a RoadTrip class that inherits from the Oracle class.
+What is the result of the following:
+
+The local variable `trip` references a `RoadTrip` object instantiated at line 288. Because the class `RoadTrip` is a subclass
+of `Oracle`, `trip` calls `Oracle#predict_the_future` via inheritance. This has a similar result as question one but because
+`RoadTrip#choices` overrides `Oracle#choices` and the calling object `trip` is a `RoadTrip` object, `choices.sample` will return
+one the three strings contained in the array at line 286. This is because `RoadTrip`'s method lookup path starts within `RoadTrip`
+and is resolved within `RoadTrip` so Ruby looks no further.
+
+class Oracle
+  def predict_the_future
+    "You will " + choices.sample
+  end
+
+  def choices
+    ["eat a nice lunch", "take a nap soon", "stay at work late"]
+  end
+end
+
+class RoadTrip < Oracle
+  def choices
+    ["visit Vegas", "fly to Fiji", "romp in Rome"]
+  end
+end
+
+trip = RoadTrip.new
+trip.predict_the_future
+
+3. How do you find where Ruby will look for a method when that method is called? How can you find an object's ancestors?
+What is the lookup chain for Orange and HotSauce?
+We can find the method lookup path for an objects class by calling the `#ancestors` method on the class of the object in
+question. `#acestors` will return an `array` that contains all the classes and modules that Rudy look to resolve a method
+a calling object.
+
+So `Orange.ancestors` returns `[Orange, Taste, Object, Kernel, BasicObject]` and `HotSauce.ancestors` returns
+`[HotSauce, Taste, Object, Kernel, BasicObject]`
+
+module Taste
+  def flavor(flavor)
+    puts "#{flavor}"
+  end
+end
+
+class Orange
+  include Taste
+end
+
+class HotSauce
+  include Taste
+end
+
+p Orange.ancestors
+p HotSauce.ancestors
+
+4. What could you add to this class to simplify it and remove two methods from the class definition while still maintaining
+the same functionality?
+
+We could delete the manual definition of the reader and writer method for the ivar `@type` and replace them with the single line
+`attr_accessor :type`. This would create both a reader and a writer method for `@type` 
+
+class BeesWax
+  def initialize(type)
+    @type = type
+  end
+
+  def type
+    @type
+  end
+
+  def type=(t)
+    @type = t
+  end
+
+  def describe_type
+    puts "I am a #{@type} of Bees Wax"
+  end
+end
+
+5. There are a number of variables listed below. What are the different types and how do you know which is which?
+`excited_dog` is a local variable. It is in lowercase and snakecase format.
+`@excited_dog` is an instance variable. It has an `@` symbol prepended.
+`@@excited_dog` is a class variable becuase it has two `@` symbols prepended.
+
+6. If I have the following class:
+Which one of these is a class method (if any) and how do you know? How would you call a class method?
+
+`self.manufacturer` is a class method becuase it has `self.` prepended to the name. We call a class method by
+invoking it with the class but without `self.` prepended. So to invoke `self.manufacturer` we would code the
+following: `Television.manufacturer` 
+=end
+
+class Television
+  def self.manufacturer
+    # method logic
+  end
+
+  def model
+    # method logic
+  end
+end
+
+class Cat
+  @@cats_count = 0
+
+  def initialize(type)
+    @type = type
+    @age  = 0
+    @@cats_count += 1
+  end
+
+  def self.cats_count
+    @@cats_count
+  end
+end

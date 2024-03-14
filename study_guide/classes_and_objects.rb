@@ -1,6 +1,6 @@
 =begin
 To define a Class in Ruby we use similar syntax to that of defining a method.
-We replace the `def` reserved word with `class` and use the CamelCase format to
+We replace the `def` reserved word with `class` and use the PascalCase format to
 name the class. Then use the reserved word `end` to finish the class
 definition, e.g., class Dog; end
 
@@ -23,6 +23,13 @@ Instance methods are methods that are available to an instance of a class, i.e.
 they allow Ruby to expose an object's state and give an object behaviors that
 are common to its class. When an instance variable has a method to expose its
 state, it is then generally considered to be an attribute.
+
+In Ruby, objects are instances of a class. For example, strings are an instance of the String
+class. A class can be thought of as the mold that makes the objects of that class. Classes
+define objects. Defining a class is similar to defining a method but instead of using the `def`
+reserved word, `class` is used followed by the name of the class formatted using the `PascalCase`
+naming convention. Finally to finish defining the class we use `end`. 
+
 =end
 
 class Thing

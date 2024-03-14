@@ -116,3 +116,62 @@ p defender.block_ball
 # myChildObject = MyChildClass.new('Parent ivar')
 # p myChildObject
 # p myChildObject.parent_ivar
+
+class Bookshelf
+  def books
+    @books ||= []
+  end
+
+  def add_book(book)
+    books << book
+  end
+end
+
+class Book
+  def initialize(title, author)
+    @title = title
+    @author = author
+  end
+
+  def to_s
+    "'#@title', by #@author"
+  end
+end
+
+shelf = Bookshelf.new
+shelf.add_book(Book.new("The Trial", "Franz Kafka"))
+puts shelf.books
+puts shelf.inspect
+
+class Shelf
+  def books
+    @objects ||= []
+  end
+
+  def add_book(book)
+    books << book
+  end
+end
+
+class Book
+  def initialize(title, author)
+    @title = title
+    @author = author
+  end
+
+  def to_s
+    "'#@title', by #@author"
+  end
+
+  def open
+  end
+end
+
+class Cabinet
+  def open
+  end
+end
+
+[Cabinet.new, Book.new].each do |obj|
+  obj.open
+end
