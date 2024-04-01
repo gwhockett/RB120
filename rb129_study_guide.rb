@@ -81,10 +81,13 @@ constant's value can be changed but Ruby will throw a warning.
 
 Constants have lexical scope, meaning the position of the constant determines where it is available. Lexical scope
 is determined by the enclosing structure / container, e.g., a module or class. To resolve a constant reference Ruby
-first searches lexically, then through the ancestors of the current enclosing structure (method lookup path),
-then through the namespacing heirachy until finally at top level scope. If the namespace operator,`::`, is used to
-resolve a constant, Ruby will not look beyond the namespaced container using `::` but will follow the method lookup
-path of that container.
+first searches lexically, then through the ancestors of the current enclosing structure (method lookup path). The method
+lookup path can be adjusted depending on the order in which modules are mixed in. Ruby will search in reverse order of 
+listed mixins, i.e. the lowest or last will be searched first. After seaching the method lookup path Ruby will search
+through the namespacing heirachy until finally reaching top level scope.
+
+If the namespace operator,`::`, is used to resolve a constant, Ruby will not look beyond the namespaced container using
+`::` but will follow the method lookup path of that container.
 
 D = 'the top, outermost scope constant D'
 

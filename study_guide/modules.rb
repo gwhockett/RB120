@@ -4,6 +4,40 @@ Providing common behaviors to classes, through so called "mixins"
 Grouping similar or related classes together via namespacing.
 Grouping methods that are out of place in other parts of our code.
 
+module Moveable
+  def walk
+    "walk"
+  end
+
+  def run
+    "run"
+  end
+
+  def sit
+    "sit"
+  end
+end
+
+module Raptors
+  class Hawk
+
+  end
+
+  class Eagle
+
+  end
+end
+
+module Random
+  def Read
+    "reading"
+  end
+
+  def bath
+    "take a bath"
+  end
+end
+
 A module is a container that holds reuseable code. The reusable code could be
 classes, methods or constants. Modules are used in classes through the
 invocation of the `include` method followed by the module name formated in
