@@ -652,24 +652,39 @@ class Reader
     "Class method: `::read`"
   end
 
-  def non_setter_name_and_age(new_name, new_age)
-    puts name
-    puts age
+  def no_setter(new_name, new_age)
+    puts name # getter call
+    puts age # getter call
     name = new_name # local variable creation, not a setter call
     age = new_age # local variable creation, not a setter call
-    puts name
+    puts name 
     puts age
+    # now the getters, `#name` and `#age`, are shadowed
+    # at the scope of this method unless preprended with
+    # an explicit `self.
+    # we can see that `@name` and `@age` have not been reassigned
+    puts self.name
+    puts self.age
   end
 
   def new_name_and_age(new_name, new_age)
-    self.name = new_name # setter call
-    self.age = new_age # setter call
+    # an explicit `self` needs to be prepended for a
+    # setter call at the scope of an instance method
+    self.name = new_name
+    self.age = new_age
+    # we see that `@name` and `@age` are reassigned
+    puts name
+    puts age
   end
 end
 
 puts Readable.readable
 puts Reader.read
 puts ''
-reader1 = Reader.new("Bob", 3)
+reader1 = Reader.new("Bob", 35)
 puts reader1.readable
 puts reader1.read
+puts ''
+reader1.no_setter("Rick", 23)
+puts ''
+reader1.new_name_and_age("Jessica", 28)
