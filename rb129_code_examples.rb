@@ -77,7 +77,8 @@ puts sam.info
 
 #Instance Variables and their scope
 class Dog
-  attr_reader :name, :age, :hair
+  attr_accessor :name
+  attr_reader :age, :hair
   @hair = "wire"
 
   def initialize
@@ -86,13 +87,21 @@ class Dog
   end
 end
 
-p Dog.new # =>#<Dog:0x000055f6ba1dfb30 @name="fido">
-p Dog.new.name #=>"fido"
-p Dog.new.age #=> nil
-p Dog.new.hair#=> nil
+p fido = Dog.new # =>#<Dog:0x000055f6ba1dfb30 @name="fido">
+p fido.name # => "fido"
+fido.name = "nick"  # 'fido's `@name` value is reassigned
+p Dog.new.name #=> "fido"
+p fido.name #=> "nick"
+p Dog.new.age # => nil
+p Dog.new.hair# => nil
 
-# As we can see @hair is defined at the class level and is not initialized within instance of the Dog class.
-# While @age is invoked within #initialize is not set to a value so is not created within an instance.
+# Here, all `Dog` class instances have an `@name` intialized to a string `"fido"` that is
+# individulally scoped within the instance they are initalized in.
+# This means that we can change the value of `@name` within a specific instance like we did for `fido`
+# While `@age` is invoked within `#initialize` but not intialized to a value. Since `@age` is not intialized
+# it returns `nil`.
+# `@hair` is defined at the class level and is not scoped within instances of the `Dog` class.
+
 
 #class variables and their scope
 class Foo
@@ -480,13 +489,13 @@ end
 # Modules and their use cases
 
 # Modules are used to provide common/polymorphic behaviors to unrelated classes, through so called "mixins".
-module Cheerable
+module Personable
   def sit
-    "sit on a Zamboni via the mixin #{Cheerable}"
+    "sit on a Zamboni via the mixin #{Personable}"
   end
 
   def speak
-    "I am of the class #{self.class}. I can speak via the mixin #{Cheerable} and #{sit}."
+    "I am of the class #{self.class}. I can speak via the mixin #{Personable} and #{sit}."
   end
 end
 
@@ -497,16 +506,17 @@ module Birdable
 end
 
 class Mascot
-  include Cheerable
+  include Personable
 end
 
 class Raptors
-  include Cheerable
+  include Personable
   include Birdable
 end
 
 p Raptors.new.speak
 p Mascot.new.speak
+puts ''
 
 # Namespacing: Modules are used to contain classes that are similar in type or are related.
 # Namespacing makes it easier to recognize similar and related classes.
@@ -538,6 +548,7 @@ end
 
 p Dogs::Bulldog.new.speak
 p Mascots::Bulldog.new.speak
+puts ''
 
 # Module Methods
 module Brains
@@ -617,15 +628,17 @@ bob = BusDriver.new
 
 puts sam
 puts bob
-=end
+
 # Self
+
 p self # outputs "main"
 
 module Readable
   p self # outputs the module name
   
-  def readable
-    "`#readable` instance method calling object: #{self}"
+  def read
+  # `self` will output the calling object of this method
+    "The calling object for this invocation of `#read` is #{self}"
   end
 
   def self.readable # module method definition
@@ -633,7 +646,7 @@ module Readable
   end
 end
 
-class Reader
+class Person
   p self # outputs the class name
 
   include Readable
@@ -644,12 +657,13 @@ class Reader
     @age = age
   end
 
-  def read
-    "`#read` instance method calling object: #{self}"
+  def know
+    # `self` will output the calling object of this method
+    "The calling object for this invocation of `#know` is #{self}"
   end
   
-  def self.read # class method definition
-    "Class method: `::read`"
+  def self.persons # class method definition
+    "Class method: `::persons`"
   end
 
   def no_setter(new_name, new_age)
@@ -657,34 +671,58 @@ class Reader
     puts age # getter call
     name = new_name # local variable creation, not a setter call
     age = new_age # local variable creation, not a setter call
-    puts name 
-    puts age
+    puts name # local variable output
+    puts age # local variable output
     # now the getters, `#name` and `#age`, are shadowed
     # at the scope of this method unless preprended with
-    # an explicit `self.
-    # we can see that `@name` and `@age` have not been reassigned
-    puts self.name
-    puts self.age
+    # an explicit `self` and we can see that `@name` and
+    # `@age` have not been reassigned
+    puts self.name # getter call
+    puts self.age # getter call
   end
 
   def new_name_and_age(new_name, new_age)
     # an explicit `self` needs to be prepended for a
     # setter call at the scope of an instance method
-    self.name = new_name
-    self.age = new_age
+    self.name = new_name # setter call
+    self.age = new_age # setter call
     # we see that `@name` and `@age` are reassigned
-    puts name
-    puts age
+    puts name # getter call
+    puts age # getter call
   end
 end
 
-puts Readable.readable
-puts Reader.read
 puts ''
-reader1 = Reader.new("Bob", 35)
-puts reader1.readable
+puts Readable.readable
+puts Person.persons
+puts ''
+reader1 = Person.new("Bob", 35)
 puts reader1.read
+puts reader1.know
 puts ''
 reader1.no_setter("Rick", 23)
 puts ''
 reader1.new_name_and_age("Jessica", 28)
+=end
+# Fake Operators
+
+puts 10 == 10 # syntactical sugar
+puts 10.==(10) # explicit syntax of a fake operator
+
+class Dog
+  attr_reader :age
+  def initialize(age)
+    @age = age
+  end
+end
+
+puts Dog.new(10).age # 10
+# When we call `==` on the return value of a `#age` we get the expected result
+puts Dog.new(10).age == Dog.new(10).age # true
+puts Dog.new(20).age == Dog.new(10).age # false
+puts Dog.new(20).age > Dog.new(10).age # true
+# But invoking `==` with a `Dog` object returns what is a seemingly odd result if
+# we don't understand `==`'s inherited behavior.
+puts Dog.new(10) == Dog.new(10) # false
+puts Dog.new(10) > Dog.new(10) # NoMethodError
+

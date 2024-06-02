@@ -1,242 +1,4 @@
 =begin
-Classes and Objects
-
-In Ruby, objects are instances of a class and are created from classes. For example, strings are an
-instance of the String class. Two objects of the same class type can contain different different
-information. `"hello"` and `"good-bye"` are both strings but contain different info.
-
-Classes define objects. The attributes and behaviors of an object are determined when defining
-the class they will be derived from.
-class HousePet
-  def initialize(name)
-    @name = name           #`@name` is how all `HousePet` objects can have a unique attribute.
-  end
-
-  def walk                 # this method is a behavior that all `HousePet` objects will have.
-    "#{@name} is walking."
-  end
-end
-
-kiki = HousePet.new("Kiki") #instantiation of a new `HousePet` object.
-p kiki.walk # => "Kiki is walking."
-
-
-class Cat
-  attr_reader :name, :age
-
-  def initialize(name, age)
-    @name = name
-    @age = age
-  end
-
-  def speak
-    'Meow'
-  end
-end
-
-pickles = Cat.new('Pickles', 2)
-socks = Cat.new('Socks', 9)
-puts pickles.name # 'Pickles'
-puts socks.name # 'Socks'
-puts pickles.age # 2
-puts socks.age # 9
-puts pickles.speak # 'Meow'
-puts socks.speak # 'Meow'
-
-A class can be describe as a mold that forms an object. Objects of a class have two main components: state and behavior.
-The data associated with an object is its state and data is referrenced within an object by instance variables. The behavior of an
-instance object is determined by defining instance methods in its class.
-
-In this example the behaviors of the objects `fido` and `paws` are the instance methods `#name`, `#age` and
-`#speak`. The state individually of `pickles` and `socks` is given by the data refered to by the instance variables `@name` and `@age`
-within each.
-
-Class inheritance versus Mixins
-
-At the object level, inheritance can add to the group of methods a class collects in the two ways stated.
-
-Class inheritance is created when a class is subclassed from a superclass. The subclass then inheriates the group of methods of the superclass.
-Classes subclass from a single parent/superclass giving a single chain of inheritance. 
-
-Mixins, modules included into a class, add to the group of instance methods of that class. Mixins create interface inheritance but unlike class
-inheritance, as many mixins as needed can be added to a class and can be added to any class. Mixins are Ruby's way of creating multiple
-inheritance.
-
-Class inheritance is used to create heirarchical relationship domains and is used to model related classes. By adding methods to subclasses or
-overriding inherited methods, class inheritance is used to refine the behavior of subclassed objects. In contrast, mixins allow unrelated
-classes to have the same behavior. More broadly, class inheritance is used to create "is-a" relationships. If a greyhound is a type of dog,
-greyhound should subclass from the dog superclass. Mixins create "has-a" relationships. If a cat and a dog class are unrelated but both have
-the same ability to walk, a mixin can be used. Mixins are also used to give a subclass behaviors that a superclass does not.
-
-module Swimmable
-  def swim
-    "I can swim."
-  end
-end
-
-module Runnable
-  def run
-    "I can run."
-  end
-end
-
-class Dog
-  include Runnable
-  
-  def bark
-    "bark!"
-  end
-end
-
-class Greyhound < Dog
-  include Swimmable
-
-  def run 
-    super + " Really fast!"
-  end
-end
-
-class Bulldog < Dog
-  def speak
-    "I can #{bark} on command."
-  end
-end
-
-class Cat
-  include Runnable
-  include Swimmable
-
-  def swim
-    super + " But I hate to."
-  end
-end
-
-
-#related classes whose behaviors differ
-puts Greyhound.new.run
-puts Greyhound.new.bark
-puts Greyhound.new.swim
-puts
-puts Bulldog.new.run
-puts Bulldog.new.speak
-# Bulldog.new.swim #=> NoMethodError
-puts
-#unrelated class with the same behavior via a mixin
-puts Cat.new.run
-puts Cat.new.swim
-
-States and Behaviors
-
-When defining a class two questions are the usual focus: What kind of state and what kind of behavior should an
-object have? The state of an object derived from a class definition refers to the data referenced by that
-particular object. If we create another `HousePet` object, say `pickles = HousePet.new("Pickles")`, both
-'pickles' and 'kiki' are  `HousePet` objects but have different states. `kiki` contains the string `"Kiki"`
-referenced by the instance variables `@name` and `pickles` contains the string `"Pickles"` referenced by the
-instance variable `@name`. The class `HousePet` defines `@name` as a reference by which state is stored in its
-objects. For `kiki` and `pickles` a unique `@name` exists within each and is held within each until they are
-destroyed. If `kiki` goes away `@name` still exists within `pickles` and viseversa. `@name` is independent within
-each and is not kept by the class.
-
-However all instances of `HousePet` have the same behavior via the instance method `HousePet#walk` even when
-instances have a different state. Here, objects of `HousePet` have the behavior of `HousePet#walk` that exposes
-the unique data associated with an initialized `@name` held within each `HousePet` object.
-
-Instance Variables, Class Variables, Constants: their respective scopes and how inheritance affects the scope each.
-
-Instance Variables are variables that are used to tie data to the objects of a class. They start with the `@` symbol
-and are named using the snake case convention. They exist as long as the object they are initialized within exists.
-While they are defined at the class level they are scoped within objects, not the class where they are defined.
-Uninitialized instance variables return `nil`. Instance variables are initialized by an instance method that is
-found along the method look up path of the class that an object is derived from. They are accessable to instance
-methods outside of the initializing instance method along the method look up path of the object's class and don't
-need to be passed in as an argument to those instance methods.
-
-Class Variables 
-
-Class variables capture information about an entire class. They are created using two `@` symbols in front of a
-snake cased name, like this: `@@snake_case`. Class variables can be directly initialized at the class level.
-Class variables can be accessed using instance and class methods. Class variables share state between instances of
-a class.
-
-Class variables have scope anywhere within the class they are initialized and are accessible to all the subclasses that
-inheirit from the class they are initialized within. They can be initialized at the class level, within instance methods
-and class methods. Generally, using class methods in classes that have inheritance should be avoided because subclasses
-can override superclass class variables which leads to unexpected behavior. 
-
-They have two main behaviors:
-
-1. All instances of the respective class share one copy of a class variable so instances of a class can use instance
-methods to access a class variable.
-
-2. Initialized class variables can be accessed by class methods.
-
-Constant Variables
-
-When creating classes there may be values that shouldn't be changed. To prevent
-a value from changing a constant variable can be used. A constant is
-defined using all uppercase letters for its name, like this:
-`NAME = 'Sheila'`. While constants can be defined with just the first letter
-uppercase, convention dictates all uppercase be used. Technically, a
-constant's value can be changed but Ruby will throw a warning.
-
-Constants have lexical scope, meaning the position of the constant determines where it is available. Lexical scope
-is determined by the enclosing structure / container, e.g., a module or class. To resolve a constant reference Ruby
-first searches lexically, then through the ancestors of the current enclosing structure (method lookup path). The method
-lookup path can be adjusted depending on the order in which modules are mixed in. Ruby will search in reverse order of 
-listed mixins, i.e. the lowest or last will be searched first. After seaching the method lookup path Ruby will search
-through the namespacing heirachy until finally reaching top level scope.
-
-If the namespace operator,`::`, is used to resolve a constant, Ruby will not look beyond the namespaced container using
-`::` but will follow the method lookup path of that container.
-
-D = 'the top, outermost scope constant D'
-
-module Bianca
-  B = "module Bianca constant B"
-
-  class Cassio
-    C = "class Cassio constant C"
-
-    def retrieve_constant_b
-      B
-    end
-
-    def retrieve_constant_c
-      C
-    end
-
-    def retrieve_constant_d
-      D
-    end
-  end
-
-  module Othello
-    O = "module Othello constant O"
-  end
-
-  class Lago < Cassio
-    include Othello
-  
-    def retrieve_constant_o
-      O
-    end
-  end
-end
-
-
-p Bianca::Lago.ancestors # for reference
-puts ''
-p Bianca::Lago.new.retrieve_constant_o
-p Bianca::Lago.new.retrieve_constant_b
-p Bianca::Lago.new.retrieve_constant_c
-p Bianca::Lago.new.retrieve_constant_d
-puts ''
-p Bianca::Lago::O
-p Bianca::Lago::C
-#p Bianca::Lago::B # Unintialized constant error
-#p Bianca::Lago::D # Unintialized constant error
-
-################################################################
 For the topics shown below, you should be able to provide clear explanations, using code snippets as examples, and be able to identify these concepts within code snippets.
 
 **Classes and objects**
@@ -287,7 +49,7 @@ Class methods are called by a class, not the objects of a class. Class methods a
 
 Ruby gives us access modifiers to create behavioral encapsulation. Access modifiers restrict or allow where an instance method can be invoked ,i.e. method access control. Ruby gives us three instance methods to modify the accessibility of the instance methods of a class: `public`, `private` and `protected`. Any instance method defined below an access modifier invocation, with no arguments passed to the modifier, will have that access status. Those instance methods will have that access status until another modifier is invoked to change the status of the following instance method definitions. Access modifiers can be used in classes or mixins. 
 
-By default, all instance methods are set to `public`. Generally, a class should have as few `public` methods as possible. `public` methods are the interface used for intentional exposure of attributes and behaviors.
+By default, all instance methods are set to `public`. `public` methods are available anywhere in a program.  `public` methods are the interface for intentional exposure of attributes and behaviors. Generally, a class should have as few `public` methods as possible.
 
 Methods that have`private` accessibility can only be invoked by the current object instance within the scope of a instance method of the same class as the current object. Trying to call a `private` method directly inside or outside of a class will generate a NoMethodError. Keeping methods `private` is useful in the management of sensitive information like social security numbers, passwords and limiting the interface of objects.
 
@@ -299,7 +61,9 @@ Class inheritance is created when a class is subclassed from a superclass. The s
 
 Encapsulation in OOP controls how parts of a code base interact with each other and promotes more effective programming through greater code sophistication. When data and behavior are available throughout a program it can be described as more monolithic and undifferentiated. The rigidity of a monolithic code base makes data protection and unintended modification more difficult. OOP in Ruby creates encapsulation of data by capturing it in an object of a class. Encapsulation of behavior is created by controlling where the methods of an object can be accessed.
 
-Polymorphism is the plurality of data types that an interface can interact with. In Ruby, different object types can invoke the same method if the differing objects can provide the needed parameters to invoke the same method. Ruby implements polymorphism through class inheritance, interface inheritance and duck-typing. Class inheritance and interface inheritance polymorphism give varying objects intersecting method lookup paths to achieve polymorphic structure and behavior. Polymorphism through duck-typing is when different objects can respond to different methods of the same name but their respective method lookup paths do not intersect. With duck-typing, sameness of behavior of unrelated objects should be built into the code. So, if something can quack, you can treat it like a "duck." Polymorphism should be implemented to create clarity of the intention of the code base. Merely using a polymorphic technique is not polymorphism proper.
+Polymorphism is the plurality of data types that an interface can interact with, i.e different objects types that can invoke a method of the same name. In Ruby, different object types can invoke the same method if the differing objects can provide the needed parameters to invoke the same method. Ruby implements polymorphism through class inheritance, interface inheritance and duck-typing. Class inheritance and interface inheritance polymorphism give varying objects intersecting method lookup paths to achieve polymorphic structure and behavior.
+Polymorphism through duck-typing is when different objects can respond to different methods of the same name but their respective method lookup paths do not intersect. With duck-typing, sameness of behavior of unrelated objects should be built into the code. So, if something can quack, you can treat it like a "duck."
+Polymorphism should be implemented to create clarity of the intention of the code base. Polymorphism gives us flexibility of the use of existing code for new purposes and merely using a polymorphic technique is not polymorphism proper.
 
 **Modules and their use cases**
 
@@ -319,7 +83,7 @@ When a class inherits a method, we can redefine a method of the same name within
 
 If we don't want Ruby to terminate method lookup for an overridden method we can use the keyword `super` within the overridden method and Ruby will continue looking up the method path for a method of the same name. `super` with no parentheses passes all arguments passed to the overridden method to the next method of the same name up the path. `super()` will pass no arguments to the overridden method even if that method has arguments. `super(a)` will pass `a`  to the overridden method. Multiple arguments can be passed to the overridden method as well.
 
-Accidental overriding  happens when a method is unintentionally defined with the same name as an inherited method. This can have far reaching effects, especially if a method inherited from the `Object` class is overridden. It is generally not a good idea to override methods from the `Object` class. `to_s` is an exception to overriding an `Object` method. Overriding `to_s` is used to return a string representation of the current object and should only return a string with no side effects. If the return value of `to_s` is anything other than a string, invoking `to_s` will be the same as calling `to_s` on the calling object, which returns the class name and encoding information for its object id.
+Accidental overriding  happens when a method is unintentionally defined with the same name as an inherited method. This can have far reaching effects, especially if a method inherited from the `Object` class is overridden. It is generally not a good idea to override methods from the `Object` class. `to_s` is an exception to overriding an `Object` method. Overriding `to_s` is used to return a string representation of the current object and should only return a string with no side effects. If the return value of `to_s` is anything other than a string, invoking `to_s` will be the same as calling `to_s` on the calling object, which returns the class name and encoding information for its object id. Fake operators are often overridden as well.
 
  **self**
 
@@ -328,7 +92,7 @@ Accidental overriding  happens when a method is unintentionally defined with the
 **Fake operators and equality**
 
 Fake Operators:
-Ruby's syntactical sugar makes certain methods look like an operator or so called "fake operators". For instance, `str1 == str2` is fully written out like this: `str1.==(str2)`. Custom classes inherit these fake operators. At times these operators need to be overridden to return a custom or expected result.
+Ruby's syntactical sugar makes certain methods look like an operator or so called "fake operators". For instance, `str1 == str2` is fully written out like this: `str1.==(str2)`. Custom classes may or may not inherit these fake operators and a fake operator's behavior often depends on the calling object type. At times these operators need to be overridden to return a custom or expected result. For instance, custom classes inherit `BasicObject#==`. `BasicObject#==` compares whether the caller and the argument are the same object, not whether they have the same return value. Even if two objects have the same state, `false` will be returned if they are different objects. Without overriding `#==`, invoking `#==` using a custom class object behaves the same as `BasicObject#==` . `BasicObject#==` is one the most common overridden fake operators. It can be used to compare specific attributes or the whole state of objects. When `BasicObject#==` is overridden we automatically get `#!=` along with it. However when overriding `#>` we don't automatically get `#<` and vise-versa.
 
 The following are true operators:
 - `.` method resolution
@@ -351,8 +115,6 @@ The following are "fake operators", i.e., instance methods:
 - `^`, `|` Bitwise exclusive "or" and regular "or" (inclusive "or")
 - `<=`, `<`, `>`, `>=` Less than/equal to, less than, greater than, greater than/equal to
 - `<=>`, `==`, `===`, `!=`, `=~`, `!~`	Equality and pattern matching (`!~` cannot be directly defined)
-
-Custom classes inherit `BasicObject#==`. `BasicObject#==` compares whether the caller and the argument are the same object, not whether they have the same return value. Even if two objects have the same state, `false` will be returned if they are different objects. Without overriding `#==` invoking `#==` using a custom class object behave the same as `BasicObject#==` . `BasicObject#==` is one the most common overridden fake operators. It can be used to compare specific attributes or the whole state of objects. When `BasicObject#==` is overridden we automatically get `#!=` along with it. However with when overriding `#>` we don't automatically get `#<` and vise-versa.
 
 When working with a collection and we want to access and modify the elements of a collection, we need to define the element getter method:
 
