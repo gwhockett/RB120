@@ -87,19 +87,20 @@ class Dog
   end
 end
 
-p fido = Dog.new # =>#<Dog:0x000055f6ba1dfb30 @name="fido">
-p fido.name # => "fido"
-fido.name = "nick"  # 'fido's `@name` value is reassigned
+p dog1 = Dog.new # =>#<Dog:0x000055f6ba1dfb30 @name="fido">
+p dog1.name # => "fido"
+dog1.name = "nick"  # 'fido's `@name` value is reassigned
 p Dog.new.name #=> "fido"
-p fido.name #=> "nick"
+p dog1.name #=> "nick"
 p Dog.new.age # => nil
 p Dog.new.hair# => nil
 
-# Here, all `Dog` class instances have an `@name` intialized to a string `"fido"` that is
-# individulally scoped within the instance they are initalized in.
-# This means that we can change the value of `@name` within a specific instance like we did for `fido`
-# While `@age` is invoked within `#initialize` but not intialized to a value. Since `@age` is not intialized
-# it returns `nil`.
+# Here, new `Dog` class instances have an `@name` intialized to a string `"fido"`.
+# Each `@name` is individulally scoped within the new instance of `Dog`.
+# This means that we can change the value of `@name` within a specific instance
+# like we did for the instance `dog1`.
+# While an `@age` is named within `#initialize` but not intialized to a value. Since `@age` is not intialized
+# it returns `nil` and is not scoped within an object.
 # `@hair` is defined at the class level and is not scoped within instances of the `Dog` class.
 
 
@@ -576,6 +577,61 @@ end
 puts Chicken.new.speak
 puts Person.new.speak
 
+# Class Inheritance vs. Modules
+=end
+module Walkable
+  def walk
+    "walked"
+  end
+end
+
+module Fuelable
+  def gasoline
+    "gas added"
+  end
+end
+
+module Sleepable
+  def sleep
+    "sleeping"
+  end
+end
+
+class Mammal
+  include Sleepable
+  attr_reader :warm_blooded
+
+  def initialize
+    @warm_blooded = "warm_blooded"
+  end
+end
+
+class Dog < Mammal
+  include Walkable
+
+  def bark
+    "bark"
+  end
+end
+
+class Beagle < Dog
+  def hunt
+    "hunt"
+  end
+end
+
+class Lawnmower
+  include Fuelable
+  include Walkable
+end
+
+subclassed_warm_blooded_sleepers = [Dog.new, Beagle.new]
+mixed_in_walkers = [Dog.new, Beagle.new, Lawnmower.new]
+
+subclassed_warm_blooded_sleepers.each { |animal| puts "#{animal.warm_blooded} and #{animal.sleep}" }
+mixed_in_walkers.each { |mover| puts mover.walk }
+
+=begin
 # Method Lookup Path
 
 module Boatable
@@ -703,7 +759,7 @@ puts ''
 reader1.no_setter("Rick", 23)
 puts ''
 reader1.new_name_and_age("Jessica", 28)
-=end
+
 # Fake Operators
 
 puts 10 == 10 # syntactical sugar
@@ -725,4 +781,4 @@ puts Dog.new(20).age > Dog.new(10).age # true
 # we don't understand `==`'s inherited behavior.
 puts Dog.new(10) == Dog.new(10) # false
 puts Dog.new(10) > Dog.new(10) # NoMethodError
-
+=end
