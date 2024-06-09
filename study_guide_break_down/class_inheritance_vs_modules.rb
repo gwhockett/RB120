@@ -1,5 +1,4 @@
-# Class Inheritance vs. Modules
-=end
+# Class Inheritance vs. Interface Inheirtance (mixins)
 module Walkable
   def walk
     "walked"
@@ -14,30 +13,25 @@ end
 
 module Sleepable
   def sleep
-    "sleeping"
+    "sleeps"
   end
 end
 
 class Mammal
   include Sleepable
-  attr_reader :warm_blooded
-
-  def initialize
-    @warm_blooded = "warm_blooded"
-  end
 end
 
 class Dog < Mammal
   include Walkable
 
   def bark
-    "bark"
+    "barks"
   end
 end
 
 class Beagle < Dog
   def hunt
-    "hunt"
+    "hunts"
   end
 end
 
@@ -46,8 +40,11 @@ class Lawnmower
   include Walkable
 end
 
-subclassed_warm_blooded_sleepers = [Dog.new, Beagle.new]
+subclassed_sleepers = [Mammal.new, Dog.new, Beagle.new]
 mixed_in_walkers = [Dog.new, Beagle.new, Lawnmower.new]
 
-subclassed_warm_blooded_sleepers.each { |animal| puts "#{animal.warm_blooded} and #{animal.sleep}" }
+subclassed_sleepers.each { |animal| puts "I am an animal that #{animal.sleep} but may not walk." }
 mixed_in_walkers.each { |mover| puts mover.walk }
+
+puts Beagle.new.bark
+puts Lawnmower.new.gasoline
