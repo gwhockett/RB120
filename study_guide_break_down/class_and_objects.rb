@@ -1,18 +1,22 @@
 #classes and objects
 class Car
-  attr_reader :type, :year # `Car` object getter behaviors for exposing state.
-
+  # `Car` object getter behaviors for exposing state
+  attr_reader :type, :year
   def initialize(type, year)
-    @type = type #Creation of attributes from the arguments passed to `::new`
-    @year = year #`@type` and `@year` are how a `Car` object reference the data of its state.
+    #Creation of attributes from the arguments passed to `::new`
+    #`@type` and `@year` are how a `Car` object reference the data of its state
+    @type = type
+    @year = year
   end
 
-  def drive # A behavior of `Car` objects
+  # `#drive` is behavior of `Car` objects
+  def drive
     '...driving'
   end
 end
 
-honda = Car.new('Honda', 2016) # Instantiation of a new `Car` object.
+# Instantiation of a new `Car` object
+honda = Car.new('Honda', 2016)
 puts honda.type # 'Honda'
 puts honda.year # 2016
 puts honda.drive # '...driving'

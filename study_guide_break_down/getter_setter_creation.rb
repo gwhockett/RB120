@@ -1,8 +1,11 @@
 # Getter and Setter creation
 class Person
-  attr_reader :name, :age # accessor getter creation for `name` and `@age`
-  attr_writer :age # accessor setter creation for `@age`
-  attr_accessor :occupation # accessor getter and setter creation for `@occupation`
+  # accessor getter creation for `@name` and `@age`
+  attr_reader :name, :age
+  # accessor setter creation for `@age`
+  attr_writer :age
+  # accessor getter and setter creation for `@occupation`
+  attr_accessor :occupation
 
   def initialize
     @age = 12
@@ -11,11 +14,13 @@ class Person
     @name = "Sam"
   end
 
-  def shoe_size # getter definition for `@shoe_size`
+  # getter definition for `@shoe_size`
+  def shoe_size
     @shoe_size
   end
 
-  def shoe_size=(size) # setter definition for `@shoe_size`
+  # setter definition for `@shoe_size`
+  def shoe_size=(size)
     @shoe_size = size
   end
 

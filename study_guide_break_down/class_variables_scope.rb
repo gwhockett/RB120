@@ -22,5 +22,7 @@ puts Foo.instantiations
 Bar.new
 puts Bar.instantiations
 puts Foo.instantiations
-# We get the output of `2` for both `Foo` and `Bar` even though we have only created one `Bar` and one `Foo` object.
-# Since `Bar` is subclassed from `Foo` and share a single class variable, `@@instantiations`, the output is given via class variable scoping.
+# We get the output of `2` for both `Foo` and `Bar` even though we have only
+# created one `Bar` and one `Foo` object.
+# Since `Bar` is subclassed from `Foo` and share a single class variable,
+# `@@instantiations`, the output is given via class variable scoping.

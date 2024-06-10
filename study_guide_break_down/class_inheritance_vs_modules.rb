@@ -43,7 +43,10 @@ end
 subclassed_sleepers = [Mammal.new, Dog.new, Beagle.new]
 mixed_in_walkers = [Dog.new, Beagle.new, Lawnmower.new]
 
-subclassed_sleepers.each { |animal| puts "I am an animal that #{animal.sleep} but may not walk." }
+subclassed_sleepers.each do |animal|
+  puts "I am an animal that #{animal.sleep} but may not walk."
+end
+
 mixed_in_walkers.each { |mover| puts mover.walk }
 
 puts Beagle.new.bark

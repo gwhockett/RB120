@@ -89,6 +89,6 @@ puts ''
 
 p "However the namespace resolution operator can't reference a constant that is outside of"
 p "the lexical scope it searches."
-puts Othello::TOP_LEVEL #...uninitialized constant Othello::TOP_LEVEL (NameError)
-puts Bianca::TOP_LEVEL #...uninitialized constant Bianca::TOP_LEVEL (NameError)
-puts Lago::TOP_LEVEL #...uninitialized constant Lago::TOP_LEVEL (NameError)
+puts Othello::TOP_LEVEL # uninitialized constant Othello::TOP_LEVEL (NameError)
+puts Bianca::TOP_LEVEL # uninitialized constant Bianca::TOP_LEVEL (NameError)
+puts Lago::TOP_LEVEL # uninitialized constant Lago::TOP_LEVEL (NameError)

@@ -11,7 +11,8 @@ end
 
 class BusDriver < Driver
   def drive # Overrides `#drive` inherited from `Driver`
-    "bus and a " + super # Here `super` incorporates the behavior of the overriden `#drive`
+    # Here `super` incorporates the behavior of the overriden `#drive`
+    "bus and a " + super
   end
 end
 

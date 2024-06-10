@@ -1,4 +1,5 @@
-# Namespacing: Modules are used to contain classes that are similar in type or are related.
+# Namespacing: Modules are used to contain classes that are similar in type or
+# are related.
 # Namespacing makes it easier to recognize similar and related classes.
 # Namespacing prevents the collision of similarly named classes.
 

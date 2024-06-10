@@ -11,7 +11,8 @@ end
 
 class Chicken
   def speak
-    "I am a #{self.class} and I can play #{Brains.tic_tac_toe}." # the preferred way to invoke a module method.
+    # the preferred way to invoke a module method.
+    "I am a #{self.class} and I can play #{Brains.tic_tac_toe}."
   end
 end
 

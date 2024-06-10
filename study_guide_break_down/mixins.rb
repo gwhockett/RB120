@@ -1,4 +1,5 @@
-# Modules are used to provide common/polymorphic behaviors to unrelated classes, through so called "mixins".
+# Modules are used to provide common/polymorphic behaviors to unrelate
+# classes, through so called "mixins".
 module Personable
   def sit
     "sit on a Zamboni via the mixin #{Personable}"

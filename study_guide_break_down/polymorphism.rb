@@ -31,6 +31,9 @@ class Duck
   end
 end
 
-[Parent.new, Child.new].each { |obj|  puts obj.hair_color } # Polymorphism through class inheritance
-[Child.new, Dog.new].each { |obj| puts obj.walk("run") } # Polymorphism through interface inheritance / mixins
-[Dog.new, Duck.new].each { |obj| puts obj.walk} # Ducktyping polymorphism
+# Polymorphism through class inheritance
+[Parent.new, Child.new].each { |obj|  puts obj.hair_color }
+# Polymorphism through interface inheritance / mixins
+[Child.new, Dog.new].each { |obj| puts obj.walk("run") }
+# Ducktyping polymorphism
+[Dog.new, Duck.new].each { |obj| puts obj.walk}

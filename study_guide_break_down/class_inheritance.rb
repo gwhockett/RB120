@@ -9,22 +9,26 @@ class Mammal
   end
 end
 
-class Dog < Mammal # now `Dog` has the behaviors of `Mammal` and is refined by `#bark`
+# now `Dog` has the behaviors of `Mammal` and is refined by `#bark`
+class Dog < Mammal
   def bark
     "barking"
   end
 end
 
-class Cat < Mammal # now `Cat` has the behaviors of `Mammal` and is refined by `#purr`
+# now `Cat` has the behaviors of `Mammal` and is refined by `#purr`
+class Cat < Mammal
   def purr
     "purring"
   end
 end
 
-[Dog.new, Cat.new].each do |mammal| # use of "dry" code and polymorphic behavior via class inheritance.
+# use of "dry" code and polymorphic behavior via class inheritance.
+[Dog.new, Cat.new].each do |mammal|
   puts mammal.sleep
   puts mammal.run
 end
 
-puts Dog.new.bark # subclass objects with behaviors specific to their class.
+# subclass objects with behaviors specific to their class.
+puts Dog.new.bark
 puts Cat.new.purr

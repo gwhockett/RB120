@@ -1,3 +1,4 @@
+# Collaborator Objects
 class Car
   attr_accessor :fuel
   attr_reader :name
@@ -23,8 +24,8 @@ class Gasoline
 end
 
 old_car = Car.new
-# the string `"Model T"` referenced by `@name` scoped within `old_car` is not considered
-# to be a collaborating object.
+# the string `"Model T"` referenced by `@name` scoped within `old_car` is not
+# considered a collaborating object.
 p old_car
 # Since `old_car` doesn't have a `Gasoline` object stored as state, `old_car`
 # can't drive.
