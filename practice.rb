@@ -442,5 +442,3 @@
 # #1 — What will the following code output? Why?
 # System Stack Error. The body of the setter method `Student#id=` is calling itself, `self.id = value`, at its own definition. This causes a recursive
 # loop.
-=begin
-
